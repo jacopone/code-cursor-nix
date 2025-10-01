@@ -61,12 +61,14 @@ get_latest_version() {
 
     log_info "Checking API for platform: $api_platform"
 
+    local url="https://api2.cursor.sh/updates/api/download/stable/$api_platform/cursor"
     local response
-    response=$(curl -sS "https://api2.cursor.sh/updates/api/download/stable/$api_platform/cursor" 2>&1)
+    response=$(curl -sS -A "cursor-nix/1.0" "$url" 2>&1)
     local curl_status=$?
 
     if [ $curl_status -ne 0 ]; then
         log_error "Failed to fetch version info from API (curl exit code: $curl_status)"
+        log_error "URL: $url"
         log_error "Response: $response"
         return 1
     fi
@@ -74,7 +76,8 @@ get_latest_version() {
     # Validate JSON
     if ! echo "$response" | jq empty 2>/dev/null; then
         log_error "Invalid JSON response from API"
-        log_error "Response: $response"
+        log_error "URL: $url"
+        log_error "Response (first 500 chars): ${response:0:500}"
         return 1
     fi
 
