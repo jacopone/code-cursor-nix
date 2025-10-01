@@ -46,7 +46,7 @@ if stdenv.hostPlatform.isLinux then
       # Install desktop file and icons
       install -Dm444 ${appimageContents}/cursor.desktop -t $out/share/applications
       substituteInPlace $out/share/applications/cursor.desktop \
-        --replace-fail 'Exec=AppRun' 'Exec=${pname}'
+        --replace-fail 'Exec=cursor' 'Exec=${pname}'
 
       # Copy icon files
       for size in 16 32 48 64 128 256 512 1024; do
