@@ -1,0 +1,117 @@
+name: Auto-update Cursor
+
+on:
+  schedule:
+    # Run every hour at the top of the hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Check for Cursor updates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for updates
+        id: update
+        run: |
+          set +e  # Don't exit on error
+          ./scripts/update-version.sh
+          UPDATE_EXIT_CODE=$?
+          set -e
+
+          if [ $UPDATE_EXIT_CODE -eq 0 ]; then
+            # Check if there were any changes
+            if git diff --quiet package.nix; then
+              echo "has_updates=false" >> $GITHUB_OUTPUT
+              echo "No updates available"
+            else
+              echo "has_updates=true" >> $GITHUB_OUTPUT
+              NEW_VERSION=$(grep -oP 'version = "\K[^"]+' package.nix | head -1)
+              echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+              echo "Updates available: version $NEW_VERSION"
+            fi
+          else
+            echo "has_updates=false" >> $GITHUB_OUTPUT
+            echo "Update script failed with exit code $UPDATE_EXIT_CODE"
+            exit 1
+          fi
+
+      - name: Test build (Linux x86_64)
+        if: steps.update.outputs.has_updates == 'true'
+        run: |
+          nix build .#cursor --print-build-logs
+          nix flake check
+
+      - name: Create Pull Request
+        if: steps.update.outputs.has_updates == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update cursor to ${{ steps.update.outputs.new_version }}"
+          title: "chore: update cursor to ${{ steps.update.outputs.new_version }}"
+          body: |
+            ## Cursor Update
+
+            This PR updates Cursor to version **${{ steps.update.outputs.new_version }}**.
+
+            ### Changes
+            - Updated version in `package.nix`
+            - Updated download URLs for all platforms
+            - Updated hashes for all platforms
+            - Ran `nix flake update`
+
+            ### Testing
+            - ✅ Built successfully on Linux x86_64
+            - ✅ Flake checks passed
+
+            ### Changelog
+            See: https://www.cursor.com/changelog
+
+            ---
+            🤖 This PR was created automatically by the auto-update workflow.
+          branch: auto-update/cursor-${{ steps.update.outputs.new_version }}
+          delete-branch: true
+          labels: |
+            automated
+            cursor-update
+
+      - name: Enable auto-merge
+        if: steps.update.outputs.has_updates == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Wait a moment for the PR to be created
+          sleep 5
+
+          # Get the PR number
+          PR_NUMBER=$(gh pr list --head auto-update/cursor-${{ steps.update.outputs.new_version }} --json number --jq '.[0].number')
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Enabling auto-merge for PR #$PR_NUMBER"
+            gh pr merge "$PR_NUMBER" --auto --squash
+          else
+            echo "Could not find PR to enable auto-merge"
+          fi

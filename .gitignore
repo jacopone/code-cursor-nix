@@ -1,0 +1,27 @@
+# Nix build results
+result
+result-*
+
+# Nix development shells
+.direnv/
+.envrc
+
+# Backup files
+*.bak
+*.backup
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test downloads
+cursor-test.AppImage
+*.AppImage
+*.dmg
