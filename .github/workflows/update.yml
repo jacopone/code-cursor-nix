@@ -68,9 +68,11 @@ jobs:
 
       - name: Test build (Linux x86_64)
         if: steps.update.outputs.has_updates == 'true'
+        env:
+          NIXPKGS_ALLOW_UNFREE: "1"
         run: |
-          nix build .#cursor --print-build-logs
-          nix flake check
+          nix build .#cursor --print-build-logs --impure
+          nix flake check --impure
 
       - name: Create Pull Request
         if: steps.update.outputs.has_updates == 'true'
