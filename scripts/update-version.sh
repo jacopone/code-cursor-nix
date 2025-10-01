@@ -63,13 +63,26 @@ get_latest_version() {
 
     local url="https://api2.cursor.sh/updates/api/download/stable/$api_platform/cursor"
     local response
-    response=$(curl -sS -A "cursor-nix/1.0" "$url" 2>&1)
+    local http_code
+
+    # Use temp file to avoid mixing stdout/stderr
+    local temp_file=$(mktemp)
+    http_code=$(curl -sS -w "%{http_code}" -o "$temp_file" "$url")
     local curl_status=$?
+    response=$(cat "$temp_file")
+    rm -f "$temp_file"
 
     if [ $curl_status -ne 0 ]; then
         log_error "Failed to fetch version info from API (curl exit code: $curl_status)"
         log_error "URL: $url"
-        log_error "Response: $response"
+        log_error "HTTP code: $http_code"
+        return 1
+    fi
+
+    if [ "$http_code" != "200" ]; then
+        log_error "HTTP error from API (code: $http_code)"
+        log_error "URL: $url"
+        log_error "Response: ${response:0:500}"
         return 1
     fi
 
