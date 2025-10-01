@@ -2,8 +2,8 @@ name: Auto-update Cursor
 
 on:
   schedule:
-    # Run every hour at the top of the hour
-    - cron: '0 * * * *'
+    # Run every Friday at 9:00 AM UTC
+    - cron: '0 9 * * 5'
   workflow_dispatch: # Allow manual trigger
 
 permissions:
