@@ -34,6 +34,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Debug API connectivity
+        run: |
+          echo "Testing Cursor API..."
+          curl -v "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor" 2>&1 | head -50
+          echo "---"
+          curl -sS "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor" | jq . || echo "JQ parse failed"
+
       - name: Check for updates
         id: update
         run: |
