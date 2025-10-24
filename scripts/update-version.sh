@@ -124,6 +124,31 @@ extract_download_url() {
     esac
 }
 
+# Check if URL is available (returns HTTP 200)
+check_url_availability() {
+    local url="$1"
+    local platform="$2"
+
+    log_info "Checking availability for $platform: $url"
+
+    local http_code
+    http_code=$(curl -sS -o /dev/null -w "%{http_code}" -I "$url")
+    local curl_status=$?
+
+    if [ $curl_status -ne 0 ]; then
+        log_warn "Failed to check URL availability (curl exit code: $curl_status)"
+        return 1
+    fi
+
+    if [ "$http_code" = "200" ]; then
+        log_info "✓ URL is available (HTTP $http_code)"
+        return 0
+    else
+        log_warn "✗ URL not available (HTTP $http_code)"
+        return 1
+    fi
+}
+
 # Calculate hash for a given URL
 calculate_hash() {
     local url="$1"
@@ -208,6 +233,9 @@ main() {
     declare -A platform_hashes
     declare -A platform_versions
 
+    # First pass: Collect URLs and check availability
+    log_info "=== Phase 1: Collecting URLs and checking availability ==="
+    local all_available=true
     for platform in "${!PLATFORMS[@]}"; do
         log_info "Processing platform: $platform"
 
@@ -230,6 +258,25 @@ main() {
         platform_urls[$platform]="$download_url"
 
         log_info "Download URL for $platform: $download_url"
+
+        # Check URL availability
+        if ! check_url_availability "$download_url" "$platform"; then
+            log_warn "Platform $platform is not yet available for version $latest_version"
+            all_available=false
+        fi
+    done
+
+    # If any platform is unavailable, skip this update
+    if [ "$all_available" = false ]; then
+        log_warn "Not all platforms are available yet for version $latest_version"
+        log_warn "Skipping update. Will retry on next run."
+        exit 0
+    fi
+
+    # Second pass: Download and calculate hashes
+    log_info "=== Phase 2: Downloading and calculating hashes ==="
+    for platform in "${!PLATFORMS[@]}"; do
+        local download_url="${platform_urls[$platform]}"
 
         # Calculate hash
         local hash
