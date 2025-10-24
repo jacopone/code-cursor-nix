@@ -34,19 +34,14 @@ for cmd in curl jq nix-prefetch-url nix-hash; do
 done
 
 # Platforms mapping
+# Only update current system platform (x86_64-linux)
 declare -A PLATFORMS=(
     ["x86_64-linux"]="linux-x64"
-    ["aarch64-linux"]="linux-arm64"
-    ["x86_64-darwin"]="darwin-x64"
-    ["aarch64-darwin"]="darwin-arm64"
 )
 
 # URL templates based on platform
 declare -A URL_TEMPLATES=(
     ["x86_64-linux"]="linux/x64/Cursor-VERSION-x86_64.AppImage"
-    ["aarch64-linux"]="linux/arm64/Cursor-VERSION-aarch64.AppImage"
-    ["x86_64-darwin"]="darwin/x64/Cursor-darwin-x64.dmg"
-    ["aarch64-darwin"]="darwin/arm64/Cursor-darwin-arm64.dmg"
 )
 
 # Get current version from package.nix
