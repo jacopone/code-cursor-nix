@@ -5,6 +5,7 @@
   appimageTools,
   makeWrapper,
   undmg,
+  google-chrome,
 }:
 
 let
@@ -41,6 +42,17 @@ if stdenv.hostPlatform.isLinux then
   appimageTools.wrapType2 {
     inherit pname version;
     src = source;
+
+    # Include Chrome in the FHS environment for Browser Automation
+    extraPkgs = pkgs: [
+      google-chrome
+    ];
+
+    # Ensure Chrome is accessible with standard names
+    extraBwrapArgs = [
+      "--setenv CHROME_BIN ${google-chrome}/bin/google-chrome-stable"
+      "--setenv CHROME_PATH ${google-chrome}/bin/google-chrome-stable"
+    ];
 
     extraInstallCommands = ''
       # Install desktop file and icons
