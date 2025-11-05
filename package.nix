@@ -10,12 +10,12 @@
 
 let
   pname = "cursor";
-  version = "2.0.43";
+  version = "2.0.60";
 
   sources = {
     x86_64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/8e4da76ad196925accaa169efcae28c45454cce3/linux/x64/Cursor-${version}-x86_64.AppImage";
-      hash = "sha256-ok+7uBlI9d3a5R5FvMaWlbPM6tX2eCse7jZ7bmlPExY=";
+      url = "https://downloads.cursor.com/production/c6d93c13f57509f77eb65783b28e75a857b74c03/linux/x64/Cursor-${version}-x86_64.AppImage";
+      hash = "sha256-g/FMqKk/FapbRTQ5+IG1R2LHVlDXDNDc3uN9lJMMcaI=";
     };
     aarch64-linux = fetchurl {
       url = "https://downloads.cursor.com/production/b9e5948c1ad20443a5cecba6b84a3c9b99d62582/linux/arm64/Cursor-${version}-aarch64.AppImage";
