@@ -51,9 +51,6 @@
       }
     )
     // {
-      # Version tracking for auto-update
-      version = "2.0.43";
-
       # Overlay for NixOS integration
       overlays.default = final: prev: {
         cursor = final.callPackage ./package.nix { };
