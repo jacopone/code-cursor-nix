@@ -6,6 +6,28 @@
   makeWrapper,
   undmg,
   google-chrome,
+  # Additional libraries for Electron/webview support
+  libxkbfile,
+  libsecret,
+  libGL,
+  libdrm,
+  mesa,
+  nss,
+  nspr,
+  at-spi2-atk,
+  at-spi2-core,
+  libxkbcommon,
+  xorg,
+  wayland,
+  gtk3,
+  glib,
+  pango,
+  cairo,
+  gdk-pixbuf,
+  libnotify,
+  cups,
+  libpulseaudio,
+  systemd,
 }:
 
 let
@@ -43,9 +65,45 @@ if stdenv.hostPlatform.isLinux then
     inherit pname version;
     src = source;
 
-    # Include Chrome in the FHS environment for Browser Automation
+    # Include Chrome and essential Electron/webview libraries in FHS environment
     extraPkgs = pkgs: [
       google-chrome
+      # Keyboard/input handling (fixes native-keymap errors)
+      libxkbfile
+      libxkbcommon
+      xorg.libxkbfile
+      # Security/credentials
+      libsecret
+      nss
+      nspr
+      # Graphics/GPU
+      libGL
+      libdrm
+      mesa
+      # GTK/display
+      gtk3
+      glib
+      pango
+      cairo
+      gdk-pixbuf
+      # Accessibility (needed for BrowserView)
+      at-spi2-atk
+      at-spi2-core
+      # Wayland support
+      wayland
+      # System integration
+      libnotify
+      cups
+      libpulseaudio
+      systemd
+      # X11 libraries
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
+      xorg.libxcb
     ];
 
     # Ensure Chrome is accessible with standard names
