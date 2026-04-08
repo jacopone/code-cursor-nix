@@ -17,7 +17,13 @@
   at-spi2-atk,
   at-spi2-core,
   libxkbcommon,
-  xorg,
+  libx11,
+  libxcomposite,
+  libxdamage,
+  libxext,
+  libxfixes,
+  libxrandr,
+  libxcb,
   wayland,
   gtk3,
   glib,
@@ -71,7 +77,6 @@ if stdenv.hostPlatform.isLinux then
       # Keyboard/input handling (fixes native-keymap errors)
       libxkbfile
       libxkbcommon
-      xorg.libxkbfile
       # Security/credentials
       libsecret
       nss
@@ -97,13 +102,13 @@ if stdenv.hostPlatform.isLinux then
       libpulseaudio
       systemd
       # X11 libraries
-      xorg.libX11
-      xorg.libXcomposite
-      xorg.libXdamage
-      xorg.libXext
-      xorg.libXfixes
-      xorg.libXrandr
-      xorg.libxcb
+      libx11
+      libxcomposite
+      libxdamage
+      libxext
+      libxfixes
+      libxrandr
+      libxcb
     ];
 
     # Ensure Chrome is accessible with standard names
