@@ -127,7 +127,7 @@ if stdenv.hostPlatform.isLinux then
       for size in 16 32 48 64 128 256 512 1024; do
         if [ -f ${appimageContents}/usr/share/icons/hicolor/''${size}x''${size}/apps/cursor.png ]; then
           install -Dm444 ${appimageContents}/usr/share/icons/hicolor/''${size}x''${size}/apps/cursor.png \
-            $out/share/icons/hicolor/''${size}x''${size}/apps/cursor.png
+            $out/share/icons/hicolor/''${size}x''${size}/apps/co.anysphere.cursor.png
         fi
       done
     '';
