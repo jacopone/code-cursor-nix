@@ -32,12 +32,12 @@
 
 let
   pname = "cursor";
-  version = "3.5.33";
+  version = "3.5.38";
 
   sources = {
     x86_64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/aac81804b986d739acab348ed96b8bea6e83cc57/linux/x64/Cursor-${version}-x86_64.AppImage";
-      hash = "sha256-XoUunj5IoMXHRc2DMP+Hokpkl8ZDD2OhdqDDRsgAE3k=";
+      url = "https://downloads.cursor.com/production/009bb5a3600dd98fe1c1f25798f767f686e14759/linux/x64/Cursor-${version}-x86_64.AppImage";
+      hash = "sha256-3TFV3q8/b8g5bCxktj7rELq6wFlCDu9OLksLJC63TlE=";
     };
     aarch64-linux = fetchurl {
       url = "https://downloads.cursor.com/production/3a67af7b780e0bfc8d32aefa96b8ff1cb8817f88/linux/arm64/Cursor-${version}-aarch64.AppImage";
