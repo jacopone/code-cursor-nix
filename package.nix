@@ -17,7 +17,13 @@
   at-spi2-atk,
   at-spi2-core,
   libxkbcommon,
-  xorg,
+  libx11,
+  libxcomposite,
+  libxdamage,
+  libxext,
+  libxfixes,
+  libxrandr,
+  libxcb,
   wayland,
   gtk3,
   glib,
@@ -71,7 +77,6 @@ if stdenv.hostPlatform.isLinux then
       # Keyboard/input handling (fixes native-keymap errors)
       libxkbfile
       libxkbcommon
-      xorg.libxkbfile
       # Security/credentials
       libsecret
       nss
@@ -97,13 +102,13 @@ if stdenv.hostPlatform.isLinux then
       libpulseaudio
       systemd
       # X11 libraries
-      xorg.libX11
-      xorg.libXcomposite
-      xorg.libXdamage
-      xorg.libXext
-      xorg.libXfixes
-      xorg.libXrandr
-      xorg.libxcb
+      libx11
+      libxcomposite
+      libxdamage
+      libxext
+      libxfixes
+      libxrandr
+      libxcb
     ];
 
     # Ensure Chrome is accessible with standard names
@@ -119,10 +124,12 @@ if stdenv.hostPlatform.isLinux then
         --replace-fail 'Exec=cursor' 'Exec=${pname}'
 
       # Copy icon files
+      # cursor.desktop references Icon=co.anysphere.cursor — rename on install so
+      # desktop environments can resolve the icon (AppImage ships it as cursor.png).
       for size in 16 32 48 64 128 256 512 1024; do
         if [ -f ${appimageContents}/usr/share/icons/hicolor/''${size}x''${size}/apps/cursor.png ]; then
           install -Dm444 ${appimageContents}/usr/share/icons/hicolor/''${size}x''${size}/apps/cursor.png \
-            $out/share/icons/hicolor/''${size}x''${size}/apps/cursor.png
+            $out/share/icons/hicolor/''${size}x''${size}/apps/co.anysphere.cursor.png
         fi
       done
     '';
